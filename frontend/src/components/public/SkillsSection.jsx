@@ -1,46 +1,34 @@
-import { useMemo, useState } from "react";
-import { FaCode, FaToolbox } from "react-icons/fa";
-import { TbBrandReactNative } from "react-icons/tb";
+import { FaCode, FaLayerGroup, FaTools } from "react-icons/fa";
 
-const categories = ["Programming Languages", "Frameworks", "Tools"];
-
-function SkillIcon({ icon, category, name }) {
-  const [failed, setFailed] = useState(false);
-
-  const fallback = useMemo(() => {
-    if (category === "Frameworks") return <TbBrandReactNative />;
-    if (category === "Tools") return <FaToolbox />;
-    return <FaCode />;
-  }, [category]);
-
-  if (!icon || failed) {
-    return <span className="skill-fallback">{fallback}</span>;
-  }
-
-  return <img src={icon} alt={name} onError={() => setFailed(true)} loading="lazy" />;
-}
+const categories = [
+  { name: "Programming Languages", icon: <FaCode /> },
+  { name: "Frameworks", icon: <FaLayerGroup /> },
+  { name: "Tools", icon: <FaTools /> }
+];
 
 function SkillsSection({ skills }) {
   return (
-    <section id="skills" className="section">
-      <div className="container reveal">
-        <h3 className="section-title">Skills</h3>
-        <div className="skill-groups">
-          {categories.map((category) => (
-            <div className="skill-group" key={category}>
-              <h4>{category}</h4>
-              <div className="skill-grid">
-                {skills
-                  .filter((skill) => skill.category === category)
-                  .map((skill) => (
-                    <article className="skill-card" key={skill._id}>
-                      <SkillIcon icon={skill.icon} category={skill.category} name={skill.name} />
-                      <span>{skill.name}</span>
-                    </article>
-                  ))}
-              </div>
-            </div>
-          ))}
+    <section id="skills" className="section section-lite">
+      <div className="container">
+        <h3 className="lite-title">Skills</h3>
+        <div className="skills-lite-grid">
+          {categories.map((category) => {
+            const entries = skills.filter((item) => item.category === category.name);
+
+            return (
+              <article key={category.name} className="skills-lite-card">
+                <h4>
+                  <span className="card-icon">{category.icon}</span>
+                  {category.name}
+                </h4>
+                {entries.length > 0 ? (
+                  <p>{entries.map((entry) => entry.name).join(", ")}</p>
+                ) : (
+                  <p>Add skills from dashboard.</p>
+                )}
+              </article>
+            );
+          })}
         </div>
       </div>
     </section>

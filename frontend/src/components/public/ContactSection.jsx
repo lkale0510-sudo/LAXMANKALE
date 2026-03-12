@@ -1,18 +1,11 @@
 import { useMemo, useState } from "react";
-import { FaGithub, FaLinkedin, FaTwitter } from "react-icons/fa";
+import { FaPaperPlane } from "react-icons/fa";
 import { submitContactMessage } from "../../api/publicApi";
-
-const icons = {
-  github: <FaGithub />,
-  linkedin: <FaLinkedin />,
-  twitter: <FaTwitter />
-};
 
 const initialState = {
   name: "",
   email: "",
   phone: "",
-  subject: "",
   message: ""
 };
 
@@ -20,26 +13,14 @@ function ContactSection({ contact, socialLinks }) {
   const [formState, setFormState] = useState(initialState);
   const [status, setStatus] = useState({ type: "", message: "" });
 
-  const mergedSocialLinks = useMemo(() => {
-    if (socialLinks.length > 0) {
-      return socialLinks;
-    }
-
-    const fallback = [];
-    if (contact?.github) fallback.push({ platform: "GitHub", url: contact.github, icon: "github" });
-    if (contact?.linkedin) fallback.push({ platform: "LinkedIn", url: contact.linkedin, icon: "linkedin" });
-    return fallback;
-  }, [contact, socialLinks]);
+  const links = useMemo(() => socialLinks || [], [socialLinks]);
 
   const onChange = (event) => {
     const { name, value } = event.target;
-
     if (name === "phone") {
-      const onlyDigits = value.replace(/\D/g, "").slice(0, 10);
-      setFormState((prev) => ({ ...prev, phone: onlyDigits }));
+      setFormState((prev) => ({ ...prev, phone: value.replace(/\D/g, "").slice(0, 10) }));
       return;
     }
-
     setFormState((prev) => ({ ...prev, [name]: value }));
   };
 
@@ -52,63 +33,71 @@ function ContactSection({ contact, socialLinks }) {
     }
 
     try {
-      await submitContactMessage(formState);
+      await submitContactMessage({
+        name: formState.name,
+        email: formState.email,
+        phone: formState.phone,
+        subject: "Portfolio Contact",
+        message: formState.message
+      });
+
       setStatus({ type: "success", message: "Message sent successfully." });
       setFormState(initialState);
     } catch (error) {
-      setStatus({
-        type: "error",
-        message: error.response?.data?.message || "Failed to send message. Try again."
-      });
+      setStatus({ type: "error", message: error.response?.data?.message || "Failed to send message." });
     }
   };
 
   return (
-    <section id="contact" className="section">
-      <div className="container reveal">
-        <h3 className="section-title">Contact</h3>
-        <div className="contact-grid">
-          <div className="contact-meta">
-            <p>Email: {contact?.email || "N/A"}</p>
-            <p>Phone: {contact?.phone || "N/A"}</p>
-            <p>Location: {contact?.location || "N/A"}</p>
-            <div className="hero-icons">
-              {mergedSocialLinks.map((item) => {
-                const key = (item.icon || item.platform || "").toLowerCase();
-                return (
-                  <a href={item.url} key={`${item.platform}-${item.url}`} target="_blank" rel="noreferrer">
-                    {icons[key] || <FaGithub />}
-                  </a>
-                );
-              })}
+    <section id="contact" className="section section-lite">
+      <div className="container contact-lite-wrap">
+        <div className="contact-head">
+          <span className="contact-head-icon">
+            <FaPaperPlane />
+          </span>
+          <h3>Let&apos;s build something together</h3>
+          <p>Have an idea or project? Send a message and I will reply.</p>
+        </div>
+
+        <div className="contact-lite-grid">
+          <div className="contact-lite-left">
+            <h4>Social Media</h4>
+            <p>{contact?.email || "laxman@example.com"}</p>
+            <div className="contact-links">
+              {links.map((item) => (
+                <a href={item.url} key={`${item.platform}-${item.url}`} target="_blank" rel="noreferrer">
+                  {item.platform}
+                </a>
+              ))}
             </div>
           </div>
 
-          <form className="contact-form" onSubmit={onSubmit}>
+          <form className="contact-lite-form" onSubmit={onSubmit}>
             <input name="name" value={formState.name} onChange={onChange} placeholder="Name" required />
             <input name="email" value={formState.email} onChange={onChange} placeholder="Email" required />
             <input
               name="phone"
               value={formState.phone}
               onChange={onChange}
-              placeholder="Phone (10 digits)"
+              placeholder="Contact"
               maxLength={10}
               inputMode="numeric"
               required
             />
-            <input name="subject" value={formState.subject} onChange={onChange} placeholder="Subject" required />
             <textarea
               name="message"
               value={formState.message}
               onChange={onChange}
               placeholder="Message"
-              rows={5}
+              rows={4}
               required
             />
-            <button className="btn primary" type="submit">
-              Send Message
+            <button type="submit" className="send-btn">
+              SEND MESSAGE
             </button>
-            {status.message && <p className={status.type === "error" ? "text-error" : "text-success"}>{status.message}</p>}
+            {status.message && (
+              <p className={status.type === "error" ? "text-error" : "text-success"}>{status.message}</p>
+            )}
           </form>
         </div>
       </div>

@@ -20,18 +20,20 @@ function Navbar() {
   };
 
   return (
-    <header className="nav-wrap">
-      <nav className="nav-bar container">
-        <button className="brand" onClick={() => scrollToSection("home")}>LK</button>
-        <ul className="nav-links">
+    <header className="lite-nav-wrap">
+      <nav className="container lite-nav">
+        <button className="site-name" onClick={() => scrollToSection("home")}>
+          Laxman Kale
+        </button>
+        <ul className="lite-nav-links">
           {navItems.map((item) => (
             <li key={item.target}>
               <button onClick={() => scrollToSection(item.target)}>{item.label}</button>
             </li>
           ))}
         </ul>
-        <button className="theme-toggle" onClick={toggleTheme} aria-label="Toggle theme">
-          {theme === "dark" ? <FaSun /> : <FaMoon />} {theme === "dark" ? "Light" : "Dark"}
+        <button className="icon-only" onClick={toggleTheme} aria-label="Toggle theme">
+          {theme === "dark" ? <FaSun /> : <FaMoon />}
         </button>
       </nav>
     </header>
